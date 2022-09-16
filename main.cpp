@@ -41,8 +41,6 @@ int main()
 
    shortest_job_first(vector_of_process, number_of_processes);
 
-   cout << "El programa ha terminado!" << endl;
-
    return 0;
 }
 
