@@ -19,9 +19,11 @@ struct process
    bool finished;       // Indica si el proceso ha terminado
 };
 
-void validate_positive_integer_input(int &input);
+void validate_positive_and_zero_integer_input(int &input);
 void input_processes(vector<process> &vector_of_process, int number_of_processes);
 void shortest_job_first(vector<process> vector_of_process, int number_of_processes);
+void printProcesses(vector<process> vector_of_process, int number_of_processes);
+void printAverages(float avg_turnaround_time, float avg_waiting_time, float avg_response_time, float cpu_utilization, float throughput);
 
 /**
    @brief Función principal del programa
@@ -35,7 +37,7 @@ int main()
    cout << "Introduce el número de procesos: ";
    cin >> number_of_processes;
 
-   validate_positive_integer_input(number_of_processes);
+   validate_positive_and_zero_integer_input(number_of_processes);
 
    input_processes(vector_of_process, number_of_processes);
 
@@ -48,9 +50,9 @@ int main()
    @brief Función para validar la entrada de datos
    @param input Número entero a validar (por referencia)
 **/
-void validate_positive_integer_input(int &input)
+void validate_positive_and_zero_integer_input(int &input)
 {
-   while (cin.fail() || input <= 0)
+   while (cin.fail() || input < 0)
    {
       cin.clear();
       cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -73,12 +75,12 @@ void input_processes(vector<process> &vector_of_process, int number_of_processes
       cout << "Introduce el tiempo de llegada del proceso " << i + 1 << ": ";
       cin >> p.arrival_time;
 
-      validate_positive_integer_input(p.arrival_time);
+      validate_positive_and_zero_integer_input(p.arrival_time);
 
       cout << "Introduce el tiempo de ejecución del proceso " << i + 1 << ": ";
       cin >> p.burst_time;
 
-      validate_positive_integer_input(p.burst_time);
+      validate_positive_and_zero_integer_input(p.burst_time);
 
       p.id = i + 1;
       p.start_time = 0;
@@ -118,7 +120,7 @@ void shortest_job_first(vector<process> vector_of_process, int number_of_process
    while (completed_processes != number_of_processes)
    {
       // Encontrar el proceso listo con el tiempo de ejecución más corto entre los procesos que están en la cola
-      int min_burst_time = 2147483647; // TODO: Cambiar por un valor más grande
+      int min_burst_time = INT32_MAX;
       int min_burst_time_index = -1;
 
       for (int i = 0; i < number_of_processes; i++)
@@ -162,7 +164,7 @@ void shortest_job_first(vector<process> vector_of_process, int number_of_process
    }
 
    // Calcular promedios
-   int min_arrival_time = 2147483647; // TODO: Cambiar por un valor más grande;
+   int min_arrival_time = INT32_MAX;
    int max_completion_time = -1;
 
    for (int i = 0; i < number_of_processes; i++)
@@ -179,10 +181,20 @@ void shortest_job_first(vector<process> vector_of_process, int number_of_process
    cpu_utilization = ((max_completion_time - total_idle_time) / (float)max_completion_time) * 100;
    throughput = float(number_of_processes) / (max_completion_time - min_arrival_time);
 
-   cout << endl;
    cout << setprecision(2) << fixed;
 
-   // Imprimir tabla de resultados
+   printProcesses(vector_of_process, number_of_processes);
+   printAverages(avg_turnaround_time, avg_waiting_time, avg_response_time, cpu_utilization, throughput);
+}
+
+/**
+   @brief Imprimir información de la ejecución
+   @param vector_of_process Vector de procesos (por referencia)
+   @param number_of_processes Número de procesos (por valor)
+**/
+void printProcesses(vector<process> vector_of_process, int number_of_processes)
+{
+   cout << endl;
 
    for (int i = 0; i < number_of_processes; i++)
    {
@@ -196,8 +208,18 @@ void shortest_job_first(vector<process> vector_of_process, int number_of_process
       cout << "Tiempo de respuesta: " << vector_of_process[i].response_time << endl;
       cout << endl;
    }
+}
 
-   // Imprimir promedios
+/**
+   @brief Imprimir promedios
+   @param avg_turnaround_time Promedio de tiempo de retorno (por valor)
+   @param avg_waiting_time Promedio de tiempo de espera (por valor)
+   @param avg_response_time Promedio de tiempo de respuesta (por valor)
+   @param cpu_utilization Utilización de la CPU (por valor)
+   @param throughput Rendimiento (por valor)
+**/
+void printAverages(float avg_turnaround_time, float avg_waiting_time, float avg_response_time, float cpu_utilization, float throughput)
+{
    cout << "Tiempo de retorno promedio: " << avg_turnaround_time << endl;
    cout << "Tiempo de espera promedio: " << avg_waiting_time << endl;
    cout << "Tiempo de respuesta promedio: " << avg_response_time << endl;
